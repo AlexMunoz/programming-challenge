@@ -1,7 +1,15 @@
 package de.exxcellent.challenge;
 
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Collections;
+
+import de.exxcellent.challenge.io.CSVReader;
+import de.exxcellent.challenge.model.Football;
+import de.exxcellent.challenge.model.Weather;
+import de.exxcellent.challenge.util.FootballCSVAdapter;
+import de.exxcellent.challenge.util.SortFootballBySmallAbsGoalDiff;
+import de.exxcellent.challenge.util.SortWeatherBySmallTempDiff;
+import de.exxcellent.challenge.util.WeatherCSVAdapter;
 
 /**
  * The entry class for your solution. This class is only aimed as starting point
@@ -16,20 +24,30 @@ public final class App {
      * This is the main entry method of your program.
      * 
      * @param args The CLI arguments passed
-     * @throws FileNotFoundException
      */
     public static void main(String... args) {
 
         // Your preparation code …
+        CSVReader r1 = new CSVReader("src/main/resources/de/exxcellent/challenge/weather.csv");
+        WeatherCSVAdapter a1 = new WeatherCSVAdapter(r1);
 
-        CSVReader r = new CSVReader("src/main/resources/de/exxcellent/challenge/weather.csv");
-        ArrayList<Weather> list = r.read();
-        list.sort((Weather A, Weather B) -> A.getMxT() - A.getMnT() < B.getMxT() - B.getMnT() ? -1 : 1);
+        ArrayList<Weather> weathers = a1.read();
 
-        String dayWithSmallestTempSpread = list.get(0).getDay(); // Your day analysis function call …
+        Collections.sort(weathers, new SortWeatherBySmallTempDiff());
+        Weather w = weathers.get(0);
+
+        CSVReader r2 = new CSVReader("src/main/resources/de/exxcellent/challenge/football.csv");
+        FootballCSVAdapter a2 = new FootballCSVAdapter(r2);
+
+        ArrayList<Football> teams = a2.read();
+
+        Collections.sort(teams, new SortFootballBySmallAbsGoalDiff());
+        Football f = teams.get(0);
+
+        String dayWithSmallestTempSpread = w.getDay(); // Your day analysis function call …
         System.out.printf("Day with smallest temperature spread : %s%n", dayWithSmallestTempSpread);
 
-        String teamWithSmallestGoalSpread = "A good team"; // Your goal analysis function call …
+        String teamWithSmallestGoalSpread = f.getTeamName(); // Your goal analysis function call …
         System.out.printf("Team with smallest goal spread       : %s%n", teamWithSmallestGoalSpread);
     }
 }
